@@ -1,2 +1,14 @@
 About:
   Mock objects easily
+
+
+Building, Testing, and Installing:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Running Test Coverage (cpan Devel::Cover)
+  perl Makefile.PL
+  PERL5OPT=-MDevel::Cover make test
+  cover
