@@ -222,6 +222,10 @@ sub mockify {
       # look up the mock, if we can't find one then just call the original
       # method
       my $mock = $manager->get_mock($method_name, $self, @args);
+      if(ref($self) && !defined($mock->method(@_))) {
+        $mock = $manager->get_mock($method_name, ref($self), @args);
+      }
+
       if($mock && (my $mock_method = $mock->method(@_))) {
         return $mock_method->(@_);
       }

@@ -14,7 +14,6 @@ sub test_overwrite_method {
     return 1;
 }
 
-
 sub test_overwrite_instance_method {
     my $self = shift;
 
