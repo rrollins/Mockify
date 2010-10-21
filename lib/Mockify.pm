@@ -37,6 +37,7 @@ sub method {
 }
 
 sub run_count { my $self = shift; return $self->{run_count} || 0; }
+sub reset_counts { my $self = shift; $self->{run_count} = 0; }
 
 sub runs {
   my $self  = shift;
@@ -59,7 +60,10 @@ sub n_times { my $self = shift; my $n = shift; $self->at_least($n); $self->at_mo
 sub at_least { 
   my $self = shift; 
   my $at_least = shift;
-  $self->{at_least} = $at_least if($at_least); 
+  if($at_least) {
+    $self->{at_least} = $at_least;
+    $self->reset_counts;
+  }
   return $self->{at_least};
 }
 
@@ -67,7 +71,10 @@ sub at_least {
 sub at_most {
   my $self = shift;
   my $at_most = shift;
-  $self->{at_most} = $at_most if($at_most);
+  if($at_most) {
+    $self->{at_most} = $at_most;
+    $self->reset_counts;
+  }
   return $self->{at_most};
 }
 
@@ -126,7 +133,7 @@ sub AUTOLOAD {
   elsif($name =~ /^at_most_([\w_]+)$/) { $at_most = 1;  $name = "$1"; }
 
   if   ($name eq 'once') { $n = 1; }
-  elsif($name eq 'twice') { $n = 1; }
+  elsif($name eq 'twice') { $n = 2; }
   elsif($name =~ /^exactly_(\d+)_?times?$/) { $n = "$1"; }
 
   if   ($at_least) { return $self->at_least($n);}

@@ -7,21 +7,47 @@ use strict;
 use base qw( MockifyTestBase );
 
 sub test_overwrite_method {
-    my $self = shift;
+  my $self = shift;
 
-    MyExistingClass->mock("existing_method")->returns("abc");
-    $self->assert(MyExistingClass->existing_method eq "abc", "existing_method is not overriden" );
-    return 1;
+  MyExistingClass->mock("existing_method")->returns("abc");
+  $self->assert(MyExistingClass->existing_method eq "abc", "existing_method is not overriden" );
+  return 1;
 }
 
-sub test_overwrite_instance_method {
-    my $self = shift;
+sub test_class_method_automatically_takes_on_instance_method_when_not_available {
+  my $self = shift;
 
-    my $new_instance = new MyExistingClass;
-    MyExistingClass->mock("existing_method")->returns("abc");
+  my $new_instance = new MyExistingClass;
+  MyExistingClass->mock("existing_method")->returns("abc");
 
-    $self->assert_equals($new_instance->existing_method, "abc");
-    return 1;
+  $self->assert_equals($new_instance->existing_method, "abc");
+  return 1;
+}
+
+sub test_mocked_instance_method_takes_precedence_over_mocked_class_method {
+  my $self = shift;
+
+  my $new_instance = new MyExistingClass;
+  MyExistingClass->mock("existing_method")->returns("abc");
+  $new_instance->mock("existing_method")->returns("abc from instance");
+
+   $self->assert_equals($new_instance->existing_method, "abc from instance");
+  return 1;
+}
+
+sub test_method_mock_call_once_and_twice_on_class_method {
+  my $self = shift;
+  my $new_instance = new MyExistingClass;
+  MyExistingClass->mock("existing_method")->returns("abc")->once;
+  MyExistingClass->existing_method;
+  eval { MyExistingClass->existing_method; };
+  $self->assert(defined($@), "Can only call once");
+
+  MyExistingClass->mock("existing_method")->returns("abc")->twice;
+  MyExistingClass->existing_method;
+  MyExistingClass->existing_method;
+  eval { MyExistingClass->existing_method; };
+  $self->assert(defined($@), "Can only call twice");
 }
 
 #sub test_other_stuff {
