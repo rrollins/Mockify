@@ -39,12 +39,16 @@ sub test_method_mock_call_once_and_twice_on_class_method {
   my $self = shift;
   my $new_instance = new MyExistingClass;
   MyExistingClass->mock("existing_method")->returns("abc")->once;
+  eval { Mockify->verify; };
+  $self->assert(defined($@), "Has to call once");
   MyExistingClass->existing_method;
   eval { MyExistingClass->existing_method; };
   $self->assert(defined($@), "Can only call once");
 
   MyExistingClass->mock("existing_method")->returns("abc")->twice;
   MyExistingClass->existing_method;
+  eval { Mockify->verify; };
+  $self->assert(defined($@), "Has to call twice");
   MyExistingClass->existing_method;
   eval { MyExistingClass->existing_method; };
   $self->assert(defined($@), "Can only call twice");
